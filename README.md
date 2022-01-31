@@ -43,10 +43,10 @@ This repository contains the code necessary to reproduce the figures in the manu
 | Scripts | Data |
 | --- | --- |
 | [Figure Functions](http://VIMRG/FATLAS/Figure_utils.rmd) |   |
-| [Figure 1](http://VIMRG/FATLAS/Figure1.rmd) | [Figure 1](http://VIMRG/FATLAS/Figure1_png.com) |
-| [Figure 2](http://VIMRG/FATLAS/Figure2.rmd) | [Figure 2](http://VIMRG/FATLAS/Figure2_png.com) |
-| [Figure 3](http://VIMRG/FATLAS/Figure3.rmd) | [Figure 3](http://VIMRG/FATLAS/Figure3_png.com) |
-| [Figure 4](http://VIMRG/FATLAS/Figure4.rmd) | [Figure 4](http://VIMRG/FATLAS/Figure4_png.com) |
+| [Figure 1](https://github.com/VIMRG/FATLAS/blob/Figures/Figure1.R) | [Figure 1](http://VIMRG/FATLAS/Figure1_png.com) |
+| [Figure 2](https://github.com/VIMRG/FATLAS/blob/Figures/Figure2.R) | [Figure 2](http://VIMRG/FATLAS/Figure2_png.com) |
+| [Figure 3](https://github.com/VIMRG/FATLAS/blob/Figures/Figure3.R) | [Figure 3](http://VIMRG/FATLAS/Figure3_png.com) |
+| [Figure 4](https://github.com/VIMRG/FATLAS/blob/Figures/Figure4.R) | [Figure 4](http://VIMRG/FATLAS/Figure4_png.com) |
 
 ### **Manuscript Supplemental Figures**
 | Scripts | Data |
