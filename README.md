@@ -42,7 +42,7 @@ This repository contains the code necessary to reproduce the figures in the manu
 ### **Manuscript Figures**
 | Scripts | Data |
 | --- | --- |
-| [Figure Functions](http://VIMRG/FATLAS/Figure_utils.rmd) |   |
+| [Figure Functions](https://github.com/VIMRG/FATLAS/blob/Figures/Figure_Functions.R) |   |
 | [Figure 1](https://github.com/VIMRG/FATLAS/blob/Figures/Figure1.R) | [Figure 1](http://VIMRG/FATLAS/Figure1_png.com) |
 | [Figure 2](https://github.com/VIMRG/FATLAS/blob/Figures/Figure2.R) | [Figure 2](http://VIMRG/FATLAS/Figure2_png.com) |
 | [Figure 3](https://github.com/VIMRG/FATLAS/blob/Figures/Figure3.R) | [Figure 3](http://VIMRG/FATLAS/Figure3_png.com) |
