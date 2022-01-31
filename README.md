@@ -51,10 +51,10 @@ This repository contains the code necessary to reproduce the figures in the manu
 ### **Manuscript Supplemental Figures**
 | Scripts | Data |
 | --- | --- |
-| [Supplemental Figure 1](http://VIMRG/FATLAS/Supplemental_Figure1.rmd) | [Supplemental Figure 1](http://VIMRG/FATLAS/Supplemental_Figure1_png.com) |
-| [Supplemental Figure 2](http://VIMRG/FATLAS/Supplemental_Figure2.rmd) | [Supplemental Figure 2](http://VIMRG/FATLAS/Supplemental_Figure2_png.com) |
-| [Supplemental Figure 3](http://VIMRG/FATLAS/Supplemental_Figure3.rmd) | [Supplemental Figure 3](http://VIMRG/FATLAS/Supplemental_Figure3_png.com) |
-| [Supplemental Figure 4](http://VIMRG/FATLAS/Supplemental_Figure4.rmd) | [Supplemental Figure 4](http://VIMRG/FATLAS/Supplemental_Figure4_png.com) |
+| [Supplemental Figure 1](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure1.R) | [Supplemental Figure 1](http://VIMRG/FATLAS/Supplemental_Figure1_png.com) |
+| [Supplemental Figure 2](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure2.R) | [Supplemental Figure 2](http://VIMRG/FATLAS/Supplemental_Figure2_png.com) |
+| [Supplemental Figure 3](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure3.R) | [Supplemental Figure 3](http://VIMRG/FATLAS/Supplemental_Figure3_png.com) |
+| [Supplemental Figure 4](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure4.R) | [Supplemental Figure 4](http://VIMRG/FATLAS/Supplemental_Figure4_png.com) |
 | [Pseudotime](http://VIMRG/FATLAS/Supplemental_Pseudotime.rmd) |    |
 
 
