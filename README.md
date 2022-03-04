@@ -40,7 +40,7 @@ This repository contains the code necessary to reproduce the figures in the manu
 
 ### **Manuscript Figures**
 | Scripts |
-| --- | --- |
+| --- |
 | [Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure1.R) |
 | [Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure2.R) |
 | [Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure3.R) |
@@ -48,7 +48,7 @@ This repository contains the code necessary to reproduce the figures in the manu
 
 ### **Manuscript Supplemental Figures**
 | Scripts |
-| --- | --- |
+| --- |
 | [Supplemental Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
 | [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
 | [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
