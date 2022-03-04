@@ -19,7 +19,7 @@ Corresponding Author: Celestine N. Wanjalla, MD, Ph.D.;celestine.wanjalla@vumc.o
 Persons with HIV (PWH) are at increased risk for cardiometabolic disease compared with HIV-negative persons. Subcutaneous white adipose tissue (scWAT) is a critical regulatory of systemic metabolic homeostasis through complex interactions with immune and stromal cells. We sought to characterize the scWAT of PWH with varying glucose tolerance and determine whether scWAT composition is different between diabetic PWH and diabetic HIV-negative persons. Using paired single-cell RNA sequencing and proteogenomic profiling, we generated a detailed molecular single-cell atlas of scWAT in humans with HIV-infection and with diabetes. We found significantly higher proportion of T cells in adipose tissue of PWH compared with HIV-negative individuals and and association between CD4 and CD8 effector memory T cells, glucose intolerance, and lipid-associated macrophages in PWH only. We further showed that pro-fibrotic stromal cells are expanded with higher proportion of lipid-associated macrophages. 
 
 ## **Description**
-This repository contains the code necessary to reproduce the figures in the manuscript. Some steps are non-deterministic and therefore, may not yield the same results. We also have links to download the data and interact with our online single cell atlas.
+This repository contains the code necessary to reproduce the figures in the manuscript. Some steps are non-deterministic and therefore, may not yield the same results.
 
 ## **Links**
 
@@ -30,34 +30,29 @@ This repository contains the code necessary to reproduce the figures in the manu
 [Group Website](https://koethe_lab.org)<br/>
 
 ### **Processing Code**
-| Scripts | Dataset |
-| --- | --- |
-| [Quality Control](http://VIMRG/FATLAS/QC.rmd) |     |
-| [Doublet Identification](http://VIMRG/FATLAS/SingleLane.rmd) | [Datasets](http://VIMRG/FATLAS/SingleLane.rds) |
-| [Merge Data](http://VIMRG/FATLAS/Merged.rmd) | [Dataset](http://VIMRG/FATLAS/Merged.rds) |
-| [Subset Analysis](http://VIMRG/FATLAS/Subset_Analysis.rmd) |    |
-| [Integration](http://VIMRG/FATLAS/Integration.rmd) | [Seurat Object](http://VIMRG/FATLAS/Integrated.rds) |
-| [Proportion](http://VIMRG/FATLAS/Proportion.rmd) |    |
+| Scripts |
+| --- |
+| [Pre-Processing](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreProcessing.R) |
+| [Pre-Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreIntegration_Processing.R) |
+| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreIntegration_Processing.R) |
+| [Subset Analysis](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Subset_Analysis.R) |
+| [Final Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Final_HarmonyIntegration.R) |
 
 ### **Manuscript Figures**
-| Scripts | Data |
+| Scripts |
 | --- | --- |
-| [Figure Functions](https://github.com/VIMRG/FATLAS/blob/Figures/Figure_Functions.R) |   |
-| [Figure 1](https://github.com/VIMRG/FATLAS/blob/Figures/Figure1.R) | [Figure 1](http://VIMRG/FATLAS/Figure1_png.com) |
-| [Figure 2](https://github.com/VIMRG/FATLAS/blob/Figures/Figure2.R) | [Figure 2](http://VIMRG/FATLAS/Figure2_png.com) |
-| [Figure 3](https://github.com/VIMRG/FATLAS/blob/Figures/Figure3.R) | [Figure 3](http://VIMRG/FATLAS/Figure3_png.com) |
-| [Figure 4](https://github.com/VIMRG/FATLAS/blob/Figures/Figure4.R) | [Figure 4](http://VIMRG/FATLAS/Figure4_png.com) |
+| [Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure1.R) |
+| [Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure2.R) |
+| [Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure3.R) |
+| [Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure4.R) |
 
 ### **Manuscript Supplemental Figures**
-| Scripts | Data |
+| Scripts |
 | --- | --- |
-| [Supplemental Figure 1](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure1.R) | [Supplemental Figure 1](http://VIMRG/FATLAS/Supplemental_Figure1_png.com) |
-| [Supplemental Figure 2](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure2.R) | [Supplemental Figure 2](http://VIMRG/FATLAS/Supplemental_Figure2_png.com) |
-| [Supplemental Figure 3](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure3.R) | [Supplemental Figure 3](http://VIMRG/FATLAS/Supplemental_Figure3_png.com) |
-| [Supplemental Figure 4](https://github.com/VIMRG/FATLAS/blob/Supplemental_Figures/Supplemental_Figure4.R) | [Supplemental Figure 4](http://VIMRG/FATLAS/Supplemental_Figure4_png.com) |
-| [Pseudotime](http://VIMRG/FATLAS/Supplemental_Pseudotime.rmd) |    |
-
-
+| [Supplemental Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
+| [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
+| [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
+| [Supplemental Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
 
 
 
