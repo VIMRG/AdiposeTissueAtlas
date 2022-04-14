@@ -1,6 +1,6 @@
 ##############################################################################################
 ##---------------- HATIM SINGLE CELL SUBCUTANEOUS ADIPOSE TISSUE ATLAS----------------------##
-##------------------------- DATE: 8/18/2021 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- DATE: 8/18/2021 AUTHOR: ----------------------------------------##
 ## DESCRIPTION: The following code will process and analyze 10x data for the HATIM cohort with
 ## the goal to characterize the cell populations in persons with HIV and in HIV- diabetic persons. 
 ## Runs were multiplexed in groups of 4 and 96 individuals were sequenced in a total of 24   
