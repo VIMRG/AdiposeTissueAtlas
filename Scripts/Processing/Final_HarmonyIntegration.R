@@ -1,6 +1,6 @@
 ##############################################################################################
 ##---------------- HATIM SINGLE CELL SUBCUTANEOUS ADIPOSE TISSUE ATLAS----------------------##
-##------------------------- DATE: 10/29/2021 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- DATE: 10/29/2021 AUTHOR: -------------------------------##
 ## DESCRIPTION: The following code will merge all processed subsets (Myeloid, Lymphoid (including 
 # B cells), Stromal, and Vascular) and integrate using the harmony algorithm. This will serve
 # as Figure 1 in the manuscript.
