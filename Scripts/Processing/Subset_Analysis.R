@@ -1,6 +1,6 @@
 ##############################################################################################
 ##---------------- HATIM SINGLE CELL SUBCUTANEOUS ADIPOSE TISSUE ATLAS----------------------##
-##------------------------- DATE: 10/29/2021 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- DATE: 10/29/2021 AUTHOR: -------------------------------##
 ## DESCRIPTION: The following code will analyze the cell subsets generated from merging all lanes
 #  from the project. Each major subset (Lymphoid, Vascular, Endothelial, Myeloid) will be subset
 #  and analyzed separately to remove heterotypic doublets and cells that cluster by mitochondrial
