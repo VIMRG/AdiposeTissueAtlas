@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- SINGLE LANE PROCESSING ---------------------------------##
-##------------------------- DATE: 8/18/2021 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- DATE: 8/18/2021 AUTHOR: -------------------------------##
 ## DESCRIPTION: The following code will assess each lane independently after applying QC filtering
 # and removing homotypic doublets via genetic demultiplexing. DoubletFinder results will be loaded
 # into a common metadata slot called "DoubletFinder." It is difficult to accurately annotate true
