@@ -1,5 +1,6 @@
-# A Single-Cell Molecular Atlas of White Adipose Tissue Demonstrates Differences in Myeloid and Lymphoid Cell Polarization in Type 2 Diabetes and HIV Infection
+# White Adipose Tissue Compositional and Transcriptional Patterns Regulate Inflammation in HIV Infection and Metabolic Disease
 
+Samuel S. Bailin<sup>1</sup>, Jonathan A. Kropski<sup>2,3,4</sup>, Rama D. Gangula<sup>5</sup>, LaToya Hannah<sup>6</sup>, Joshua D. Simmons<sup>6</sup>, Mona Mashayekhi<sup>6</sup>, Fei Ye<sup>7</sup>, Run Fan<sup>7</sup>, Abha Chopra<sup>8</sup>, Ramesh Ram<sup>8</sup>, Simon Mallal<sup>1,5,8-10</sup>, Christopher M. Warren<sup>5</sup>, Spyros Kalams<sup>1,5</sup>, Curtis L. Gabriel<sup>11</sup>, Celestine N. Wanjalla<sup>1,10</sup>, John R. Koethe<sup>1,3,10</sup>
 
 <sup>1</sup>Department of Medicine, Division of Infectious Diseases, Vanderbilt University Medical Center, Nashville, Tennessee, USA
 <sup>2</sup>Department of Medicine, Division of Allergy and Pulmonology, Vanderbilt University Medical Center, Nashville, Tennessee, USA
