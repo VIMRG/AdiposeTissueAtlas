@@ -46,6 +46,11 @@ This repository contains the code necessary to reproduce the figures in the manu
 | [Single Cell DGE](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/SingleCellDGE.R) |
 | [Dialogue](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Dialogue.R) |
 
+### **HIV-negative Integration Code**
+| Scripts |
+| --- |
+| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative Analyses/Initial_Merge_HIVnegative.R) |
+
 ### **Manuscript Figure Code**
 | Scripts |
 | --- |
