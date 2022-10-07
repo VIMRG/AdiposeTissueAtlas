@@ -62,12 +62,12 @@ This repository contains the code necessary to reproduce the figures in the manu
 ### **Manuscript Supplemental Figure Code**
 | Scripts |
 | --- |
-| [Supplemental Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
-| [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure2.R) |
-| [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure3.R) |
-| [Supplemental Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure4.R) |
-| [Supplemental Figure 5](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure5.R) |
-| [Supplemental Figure 6](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure6.R) |
+| [Supplemental Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure1.R) |
+| [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure2.R) |
+| [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure3.R) |
+| [Supplemental Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure4.R) |
+| [Supplemental Figure 5](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure5.R) |
+| [Supplemental Figure 6](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/SupplementalFigure6.R) |
 
 
 
