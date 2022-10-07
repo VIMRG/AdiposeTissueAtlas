@@ -25,33 +25,49 @@ This repository contains the code necessary to reproduce the figures in the manu
 
 ### **External**
 [NIH GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE198809)<br/>
-[Single-Cell Atlas](http://vimrg.app.vumc.org/)<br/>
+[Interactive Website](http://vimrg.app.vumc.org/)<br/>
 [Manuscript](https://somewebsite.com)<br/>
 
 ### **Processing Code**
 | Scripts |
 | --- |
 | [Pre-Processing](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreProcessing.R) |
-| [Pre-Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreIntegration_Processing.R) |
-| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/PreIntegration_Processing.R) |
+| [Doublet Finder](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/DoubletFinder.R) |
+| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Initial_Merge.R) |
+| [Doublet Removal](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Doublet_Removal.R) |
 | [Subset Analysis](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Subset_Analysis.R) |
-| [Final Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Final_HarmonyIntegration.R) |
+| [Final Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Processing/Final_Integration.R) |
 
-### **Manuscript Figures**
+### **Analyses Code**
+| Scripts |
+| --- |
+| [Pseudobulk](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Pseuobulk.R) |
+| [Pseudotime](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Pseudotime_PVM.R) |
+| [Single Cell DGE](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/SingleCellDGE.R) |
+| [Dialogue](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Dialogue.R) |
+
+### **Manuscript Figure Code**
 | Scripts |
 | --- |
 | [Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure1.R) |
 | [Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure2.R) |
 | [Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure3.R) |
 | [Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure4.R) |
+| [Figure 5](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure5.R) |
+| [Figure 6](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure6.R) |
+| [Figure 7](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure7.R) |
+| [Figure 8](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Figures/Figure8.R) |
+| [Helper Functions](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Helper_Functions/Utils.R) |
 
-### **Manuscript Supplemental Figures**
+### **Manuscript Supplemental Figure Code**
 | Scripts |
 | --- |
 | [Supplemental Figure 1](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
-| [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
-| [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
-| [Supplemental Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure1.R) |
+| [Supplemental Figure 2](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure2.R) |
+| [Supplemental Figure 3](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure3.R) |
+| [Supplemental Figure 4](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure4.R) |
+| [Supplemental Figure 5](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure5.R) |
+| [Supplemental Figure 6](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Supplemental_Figures/Supplemental_Figure6.R) |
 
 
 
