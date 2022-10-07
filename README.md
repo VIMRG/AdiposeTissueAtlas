@@ -49,7 +49,11 @@ This repository contains the code necessary to reproduce the figures in the manu
 ### **HIV-negative Integration Code**
 | Scripts |
 | --- |
-| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative Analyses/Initial_Merge_HIVnegative.R) |
+| [Initial Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative_Analyses/Initial_Merge_HIVnegative.R) |
+| [Doublet Removal](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative_Analyses/Doublet_Removal_HIVneg.R) |
+| [Subset Analysis](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative_Analyses/Subset_Analysis_HIVnegative.R) |
+| [Final Integration](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative_Analyses/Final_Integration_HIVneg.R) |
+| [Dialogue](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/HIVnegative_Analyses/Dialogue_HIVneg.R) |
 
 ### **Manuscript Figure Code**
 | Scripts |
