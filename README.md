@@ -1,4 +1,4 @@
-# White Adipose Tissue Compositional and Transcriptional Patterns Regulate Inflammation in HIV Infection and Metabolic Disease
+# White Adipose Tissue Compositional and Transcriptional Patterns with Progressive Glucose Intolerance in Persons with HIV
 
 Samuel S. Bailin<sup>1</sup>, Jonathan A. Kropski<sup>2,3,4</sup>, Rama D. Gangula<sup>5</sup>, LaToya Hannah<sup>6</sup>, Joshua D. Simmons<sup>6</sup>, Mona Mashayekhi<sup>6</sup>, Fei Ye<sup>7</sup>, Run Fan<sup>7</sup>, Abha Chopra<sup>8</sup>, Ramesh Ram<sup>8</sup>, Simon Mallal<sup>1,5,8-10</sup>, Christopher M. Warren<sup>5</sup>, Spyros Kalams<sup>1,5</sup>, Curtis L. Gabriel<sup>11</sup>, Celestine N. Wanjalla<sup>1,10</sup>, John R. Koethe<sup>1,3,10</sup>
 
@@ -16,7 +16,7 @@ Samuel S. Bailin<sup>1</sup>, Jonathan A. Kropski<sup>2,3,4</sup>, Rama D. Gangu
 
 
 ## **Abstract**
-Persons with HIV (PWH) are at increased risk for cardiometabolic disease compared with HIV-negative persons. Subcutaneous white adipose tissue (scWAT) is a critical regulatory of systemic metabolic homeostasis through complex interactions with immune and stromal cells. We sought to characterize the scWAT of PWH with varying glucose tolerance and determine whether scWAT composition is different between diabetic PWH and diabetic HIV-negative persons. Using paired single-cell RNA sequencing and proteogenomic profiling, we generated a detailed molecular single-cell atlas of scWAT in humans with HIV-infection and with diabetes. We found significantly higher proportion of T cells in adipose tissue of PWH compared with HIV-negative individuals and and association between CD4 and CD8 effector memory T cells, glucose intolerance, and lipid-associated macrophages in PWH only. We further showed that pro-fibrotic stromal cells are expanded with higher proportion of lipid-associated macrophages. 
+Subcutaneous adipose tissue (SAT) is a critical regulator of systemic metabolic homeostasis. Persons with HIV (PWH) have an increased risk of metabolic diseases and have significant alterations in SAT immune cells compared with the general population. We generated a comprehensive SAT atlas from 59 PWH with a spectrum of metabolic diseases to characterize cellular compositional and transcriptional changes associated with glucose intolerance and demographic characteristics. In PWH, glucose intolerance was associated with increased lipid-associated macrophages, CD4+ and CD8+ T effector memory cells, and decreased perivascular macrophages. We observed a coordinated intercellular regulatory program enriched for genes related to inflammation and lipid-processing with glucose intolerance that was also present in diabetic HIV-negative persons. Finally, CD4+ tissue resident cells were most strongly associated with altered whole tissue expression of genes related to lipid and glucose metabolism. These data provide a comprehensive assessment of SAT immune cells that may contribute to glucose intolerance.
 
 ## **Description**
 This repository contains the code necessary to reproduce the figures in the manuscript. Some steps are non-deterministic and therefore, may not yield the same results.
@@ -24,10 +24,9 @@ This repository contains the code necessary to reproduce the figures in the manu
 ## **Links**
 
 ### **External**
-[NIH GEO](https://www.ncbi.nlm.nih.gov/geo/)<br/>
-[Single-Cell Atlas]( https://imrc.shinyapps.io/shinyappmulti/)<br/>
+[NIH GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE198809)<br/>
+[Single-Cell Atlas](http://vimrg.app.vumc.org/)<br/>
 [Manuscript](https://somewebsite.com)<br/>
-[Group Website](https://koethe_lab.org)<br/>
 
 ### **Processing Code**
 | Scripts |
