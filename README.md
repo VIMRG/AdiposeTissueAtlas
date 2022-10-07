@@ -41,7 +41,7 @@ This repository contains the code necessary to reproduce the figures in the manu
 ### **Analyses Code**
 | Scripts |
 | --- |
-| [Pseudobulk](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Pseuobulk.R) |
+| [Pseudobulk](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Pseudobulk.R) |
 | [Pseudotime](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Pseudotime_PVM.R) |
 | [Single Cell DGE](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/SingleCellDGE.R) |
 | [Dialogue](https://github.com/VIMRG/AdiposeTissueAtlas/blob/main/Scripts/Analyses/Dialogue.R) |
