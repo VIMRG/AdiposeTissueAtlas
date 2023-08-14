@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- INITIAL HIV+ and HIV- INTEGRATION---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- DATE: AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: The following code will perform integration with harmony of the HIV+ and HIV- individuals.
 ##############################################################################################
 
@@ -15,15 +15,17 @@ library(SingleCellExperiment)
 
 date = "6.27"
 
+set.seed(7412)
+
 ###############################
 # Import Dataset
 ###############################
-path <- "/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/DoubletFinder/"
+path <- "../DoubletFinder"
 file_list <- list.files(path = path, pattern = ".rds")
 
 project <- c('P5344_CW3', 'P5544_CW3', 'P5573_CW3', 'P5657_CW3', 'P5836_CW3', 'P5877_CW3', 'P5903_CW3', 'P5963_CW3')
 
-seurat_path = paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/DoubletFinder")
+seurat_path = paste0("../HATIM_Analysis/", date, "/DoubletFinder")
 seurat_list <- list.files(path = seurat_path, full.names = T)
 seurat_list <- seurat_list[grep(pattern = "(_CW3)", seurat_list)]
 names(seurat_list) <- project
@@ -37,7 +39,7 @@ for (i in 1:length(seurat_list)) {
     seurat_list[[i]]@meta.data['Lane'] <- names(seurat_list)[i]
 }
 
-HIV <- readRDS("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/Final_Integration/Integrated.rds")
+HIV <- readRDS("../Integrated.rds") # Integrated HIV+ dataset
 
 # 2. MERGE AND INTEGRATE_____________________________________________________
 ###############################
@@ -75,7 +77,7 @@ integrated.data <- integrated.data %>% RunUMAP(reduction = 'harmony', dims = 1:4
 
 # 3. SAVE_____________________________________________________
 date = "6.27"
-tmp_dir <- paste("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Merged_Initial", sep = "")
+tmp_dir <- paste("../HATIM_Analysis/", date, "/Merged_Initial", sep = "")
 dir.create(tmp_dir)
 
-saveRDS(integrated.data, file = paste(tmp_dir, "Integrated_HIVnegative.rds", sep = "/"))
+saveRDS(integrated.data, file = paste(tmp_dir, "Initial_HIVnegative.rds", sep = "/"))
