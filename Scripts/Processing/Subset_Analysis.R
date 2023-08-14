@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- SUBSET ANALYSIS ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: This script will clean the subsets (major cell lineages) and annotate cells
 ## based on identified gene markers. 
 ##############################################################################################
@@ -23,9 +23,9 @@ options(future.seed = TRUE)
 set.seed(7412)
 
 date = "6.27"
-tmp <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Integrated_Filtered")
+tmp <- paste0("../HATIM_Analysis/", date, "/Integrated_Filtered")
 
-data_hatim <- readr::read_csv('/data/p_koethe_lab/Atlas_AT/MetaData/Reference/HATIMStudyVisit_DATA_2021-08-09_1359.csv')
+data_hatim <- readr::read_csv('../HATIMStudyVisit_DATA_2021-08-09_1359.csv')
 
 data_hatim <- data_hatim %>% mutate(HATIMID = as.factor(hatim_clin_visit_pid),
                                     StudyGroup = factor(hatim_final_arm, levels = c(1,2,3,4),
@@ -42,7 +42,7 @@ data_hatim <- data_hatim %>% mutate(HATIMID = as.factor(hatim_clin_visit_pid),
                                     FBG = meta_fbg) %>%
                             filter(HIV == "HIVpos")
 
-Hash_link <- read.csv("/data/p_koethe_lab/Atlas_AT/Analysis_1.22/Metadata/Hash_Link.csv")
+Hash_link <- read.csv("../Hash_Link.csv")
 Hash_link <- Hash_link %>% mutate(Hash = as.character(Hash))
 colnames(Hash_link) <- c("Lane", "HATIMID", "Soup_Hash")
 
@@ -199,7 +199,7 @@ p1 + p2
 ################################
 # Cell Annotation
 ###############################
-markers <- FindAllMarkers(Myeloid, only.pos = T, min.pct = 0.25, assay = "RNA")
+markers <- FindAllMarkers(Myeloid, only.pos = T, min.pct = 0.1, assay = "RNA")
 write.csv(markers, paste(tmp, "Myeloid.Markers.csv", sep = "/"))
 
 Idents(Myeloid) <- "seurat_clusters"
@@ -212,15 +212,15 @@ Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(8,11))) <- "LAM"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(14))) <- "Cycling Myeloid"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(15))) <- "ISG+ Mo"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(17))) <- "cMo"
-Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(18,22))) <- "Other Mac"
+Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(18,22))) <- "Mo-Mac 2"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(19))) <- "pDC"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(20))) <- "Migratory DC"
-Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(12,13,21))) <- "Mo-Mac"
+Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(12,13,21))) <- "Mo-Mac 1"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(9,16))) <- "cDC2B"
 Idents(Myeloid, cells = WhichCells(Myeloid, idents = c(23))) <- "cDC1"
 Myeloid[['Annotation']] <- Idents(Myeloid)
 
-DotPlot(Myeloid, features = c("TREM2", "APOE", "CXCL2", "CXCL3", "LYVE1", "RNASE1", "MKI67", "TIMP3", "CD1C", "CLEC9A", "CCR7", "LILRA4", "VCAN", "S100A8", "FCGR3A", "ISG15")) + 
+DotPlot(Myeloid, features = c("TREM2", "APOE", "GPNMB", "CXCL2", "CXCL3", "LYVE1", "RNASE1", "MKI67", "TIMP3", "CD1C", "CLEC9A", "CCR7", "LILRA4", "VCAN", "S100A8", "FCGR3A", "ISG15")) + 
 RotatedAxis()
 
 ################################
@@ -236,19 +236,122 @@ rownames(metadata) <- colnames(Myeloid)
 
 Myeloid <- AddMetaData(Myeloid, metadata)
 
-################################
-# Save Object
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+# Macrophage Subset Round 1
+###############################
+Macrophage <- subset(Myeloid, idents = c("PVM", "IM", "LAM", "Mo-Mac 1", "Mo-Mac 2"))
+
+# Recluster
+DefaultAssay(Macrophage) <- "RNA"
+Macrophage <- Macrophage %>% FindVariableFeatures(verbose = T, nfeatures = 3000) %>%
+        ScaleData(vars.to.regress = c("percent.mt", "nCount_RNA"), assay = "RNA") %>%
+        RunPCA()
+
+# Run Harmony
+Macrophage <- RunHarmony(Macrophage, "Lane", assay.use = "RNA", max.iter.harmony = 30)
+
+# Run Donwstream Analysis
+Macrophage <- Macrophage %>% RunUMAP(reduction = 'harmony', dims = 1:20) %>%
+  FindNeighbors(reduction = 'harmony', dims = 1:20) %>% 
+  FindClusters(resolution = 1.0)
+
+# Visualize
+p1 <- DimPlot(Macrophage, label = T) + NoLegend()
+p2 <- DimPlot(Macrophage, label = T, group.by = "Annotation") + NoLegend()
+p1 + p2
+
+# Mito - 
+p2 <- VlnPlot(Macrophage, features = 'percent.mt', pt.size = 0) + NoLegend()
+p1 + p2
+
+# RNA Count - 13
+p2 <- VlnPlot(Macrophage, features = 'nCount_RNA', pt.size = 0) + NoLegend()
+p1 + p2
+
+# Markers - cluster 12 dendritic
+markers <- FindAllMarkers(Macrophage, only.pos = T, min.pct = 0.25, assay = "RNA")
+
+# Remove cluster 12 (more dendritic), and cluster 13 (high RNA count)
+Removed_Junk <- WhichCells(Macrophage, idents = c(13))
+Removed_DC <- WhichCells(Macrophage, idents = 12)
+Remove <- c(Removed_Junk, Removed_DC)
+
+Macrophage <- subset(Macrophage, idents = c(12,13), invert = T)
+
+###############################
+# Macrophage Round 2
+###############################
+# Recluster
+DefaultAssay(Macrophage) <- "RNA"
+Macrophage <- Macrophage %>% FindVariableFeatures(verbose = T, nfeatures = 3000) %>%
+        ScaleData(vars.to.regress = c("percent.mt", "nCount_RNA"), assay = "RNA") %>%
+        RunPCA()
+
+# Run Harmony
+Macrophage <- RunHarmony(Macrophage, "Lane", assay.use = "RNA", max.iter.harmony = 30)
+
+# Run Donwstream Analysis
+Macrophage <- Macrophage %>% RunUMAP(reduction = 'harmony', dims = 1:20) %>%
+  FindNeighbors(reduction = 'harmony', dims = 1:20) %>% 
+  FindClusters(resolution = 0.4)
+
+# Visualize
+p1 <- DimPlot(Macrophage, label = T) + NoLegend()
+p2 <- DimPlot(Macrophage, label = T, group.by = "Annotation") + NoLegend()
+p1 + p2
+
+p2 <- VlnPlot(Macrophage, features = 'percent.mt', pt.size = 0) + NoLegend()
+p1 + p2
+
+p2 <- VlnPlot(Macrophage, features = 'nCount_RNA', pt.size = 0) + NoLegend()
+p1 + p2
+
+p2 <- VlnPlot(Macrophage, features = c("TREM2", "APOE", "GPNMB", "CXCL2", "VCAN", "CXCL3", "C1QB", "LYVE1"), flip = T, stack = T)
+p1 + p2
+
+###############################
+# Annotation
+###############################
+Idents(Macrophage) <- "seurat_clusters"
+Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(0))) <- "IM"
+Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(1))) <- "PVM"
+Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(2))) <- "LAM"
+Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(3))) <- "Mo-Mac 1"
+Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(4))) <- "Mo-Mac 2"
+Macrophage[["Annotation"]] <- Idents(Macrophage)
+
+###############################
+# Save Macrophage RDS
+###############################
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
 dir.create(tmp_dir)
 
-saveRDS(Myeloid, paste(tmp_dir, "Myeloid.rds", sep = "/"))
+saveRDS(Macrophage, file = paste(tmp_dir, "Macrophage_revised.rds", sep = "/"))
+
+################################
+# Save Myeloid Object
+###############################
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
+dir.create(tmp_dir)
+
+# Subset out Junk clusters
+Myeloid <- subset(Myeloid, cells = Remove, invert = T)
+
+# Now relabel Macrophages
+Idents(Myeloid, cells = WhichCells(Macrophage, idents = c("IM"))) <- "IM"
+Idents(Myeloid, cells = WhichCells(Macrophage, idents = c("LAM"))) <- "LAM"
+Idents(Myeloid, cells = WhichCells(Macrophage, idents = c("PVM"))) <- "PVM"
+Idents(Myeloid, cells = WhichCells(Macrophage, idents = c("Mo-Mac 1"))) <- "Mo-Mac 1"
+Idents(Myeloid, cells = WhichCells(Macrophage, idents = c("Mo-Mac 2"))) <- "Mo-Mac 2"
+Myeloid[['Annotation']] <- Idents(Myeloid)
+
+saveRDS(Myeloid, paste(tmp_dir, "Myeloid_revised.rds", sep = "/"))
 
 #2. LYMPHOID ANALYSIS_____________________________________________________
 ###############################
 # Import Data
 ###############################
-tmp <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Integrated_Filtered")
+tmp <- paste0("../HATIM_Analysis/", date, "/Integrated_Filtered")
 Lymphoid <- readRDS(paste(tmp, "Lymphoid.rds", sep = "/"))
 
 ###############################
@@ -399,7 +502,7 @@ p1 + p2
 ###############################
 # Add Annotation Labels
 ###############################
-markers <- FindAllMarkers(Lymphoid, only.pos = T, min.pct = 0.25, assay = "RNA")
+markers <- FindAllMarkers(Lymphoid, only.pos = T, min.pct = 0.1, assay = "RNA")
 write.csv(markers, file = paste(tmp, "Lymphoid.Markers.csv", sep = "/"))
 
 DefaultAssay(Lymphoid) <- "ADT"
@@ -435,7 +538,7 @@ Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(16))) <- "CD8 TCM"
 Idents(Lymphoid, cells = WhichCells(cluster17, expression = CD8 > 1.0)) <- "CD8 TEM"
 Idents(Lymphoid, cells = WhichCells(cluster17, expression = CD8 <= 1.0)) <- "CD4 TEM"
 Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(18))) <- "CD8 TEM"
-Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(19))) <- "Cycling T/NK"
+Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(19))) <- "Cycling T & NK"
 Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(20))) <- "MAIT"
 Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(21))) <- "CD4 Regulatory"
 Idents(Lymphoid, cells = WhichCells(Lymphoid, idents = c(22))) <- "CD16 mNK"
@@ -468,7 +571,7 @@ Lymphoid <- AddMetaData(Lymphoid, metadata)
 ###############################
 # Save Harmony Integration
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
 dir.create(tmp_dir)
 
 saveRDS(Lymphoid, file = paste0(tmp_dir, "/", "Lymphoid.rds"))
@@ -477,7 +580,7 @@ saveRDS(Lymphoid, file = paste0(tmp_dir, "/", "Lymphoid.rds"))
 ###############################
 # Import Data
 ###############################
-tmp <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Integrated_Filtered")
+tmp <- paste0("../HATIM_Analysis/", date, "/Integrated_Filtered")
 Bcells <- readRDS(paste(tmp, "Bcells.rds", sep = "/"))
 
 ###############################
@@ -571,7 +674,7 @@ p1 + p2
 ###############################
 # Annotation
 ###############################
-markers <- FindAllMarkers(Bcells, only.pos = T, min.pct = 0.25, assay = "RNA")
+markers <- FindAllMarkers(Bcells, only.pos = T, min.pct = 0.1, assay = "RNA")
 write.csv(markers, file = paste(tmp, "Bcells.Markers.csv", sep = "/"))
 
 DefaultAssay(Bcells) <- "ADT"
@@ -608,7 +711,7 @@ saveRDS(Bcells, file = paste0(tmp_dir, "/", "Bcells.rds"))
 ###############################
 # Import Data
 ###############################
-tmp <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Integrated_Filtered")
+tmp <- paste0("../HATIM_Analysis/", date, "/Integrated_Filtered")
 Stromal <- readRDS(paste(tmp, "Stromal.rds", sep = "/"))
 
 ###############################
@@ -721,7 +824,7 @@ p2 <- VlnPlot(Stromal, features = "nCount_RNA", pt.size = 0) + NoLegend()
 p1 + p2
 
 ###############################
-# Exclude Junk, Doublets: Cluster 27 passes QC but does not form distinct cluster so will remove. May try leiden at some point to see if that resolves this issue
+# Exclude Junk, Doublets: Cluster 27 passes QC but does not form distinct cluster so will remove.
 ###############################
 Stromal <- subset(Stromal, idents = c(26,29,27), invert = T)
 
@@ -785,9 +888,35 @@ Idents(Stromal, cells = WhichCells(Stromal, idents = c(9,10))) <- "Adipose Proge
 Stromal[['Annotation']] <- Idents(Stromal)
 
 ###############################
+# Remove ISG+ and recluster: After integration, looks like they are probably Doublets with innate cell so will remove
+###############################
+Stromal <- subset(Stromal, idents = "ISG+ Preadipocyte", invert = T)
+
+Stromal <- Stromal %>% RunUMAP(reduction = 'harmony', dims = 1:30) %>%
+  FindNeighbors(reduction = 'harmony', dims = 1:30) %>% 
+  FindClusters(resolution = 0.6)
+
+p1 <- DimPlot(Stromal, label = T, label.size = 4) + NoLegend()
+p2 <- DotPlot(Stromal, features = c("CD55", "MFAP5", "DPP4", "PDGFRA", "PDGFRB", "F3", "MYOC", "IGFBP7", "POSTN", "MKI67", "TIMP1", "MT1X", "FABP5", "FABP4", "C7", "LPL", "EGR1", "JUN", "FOS", "DCN", "LUM", "PI16", "GSN", "CFD", "APOD")) + RotatedAxis()
+
+
+#Idents(Stromal) <- "seurat_clusters"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(3))) <- "Progenitor Cells"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(8))) <- "PI16+ Progenitor"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(5))) <- "MYOC+ Fibroblast"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(11))) <- "Cycling Myofibroblast"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(6))) <- "Myofibroblast"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(7))) <- "Metallothionein+ Preadipocyte"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(2))) <- "Mature Preadipocyte 1"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(0))) <- "Mature Preadipocyte 2"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(1,9))) <- "Early Preadipocyte"
+#Idents(Stromal, cells = WhichCells(Stromal, idents = c(4))) <- "PTGDS+ Early Preadipocyte"
+#Stromal[['Annotation']] <- Idents(Stromal)
+
+###############################
 # Save RDS
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../", date, "/SubsetAnalysis")
 dir.create(tmp_dir)
 
 saveRDS(Stromal, file = paste0(tmp_dir, "/", "Stromal.rds"))
@@ -796,7 +925,7 @@ saveRDS(Stromal, file = paste0(tmp_dir, "/", "Stromal.rds"))
 ###############################
 # Import Data
 ###############################
-tmp <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Integrated_Filtered")
+tmp <- paste0("../HATIM_Analysis/", date, "/Integrated_Filtered")
 Vascular <- readRDS(paste(tmp, "Vascular.rds", sep = "/"))
 
 ###############################
@@ -934,8 +1063,10 @@ p1 <- DimPlot(Vascular, label = T) + NoLegend()
 p2 <- VlnPlot(Vascular, features = "percent.mt", pt.size = 0) + NoLegend()
 p1 + p2
 
-# Doublet: None
-p2 <- DotPlot(Vascular, features = c("CCDC80", "LUM", "LYZ", "NKG7", "CD3E", "MS4A1")) + RotatedAxis()
+# Doublets: Clusters 1, 4, 6,18, 29, 30,31,33,35 also 23, 26 to a certain extent express both VSMC/Pericyte markers and Endothelial markers. While these
+# seem to have some unique genes, suggesting they could be EndoMT and pass doublet QC detection, this could also be related to tissue dissociation so will remove all
+# except 23 and 26 here
+p2 <- DotPlot(Vascular, features = c("CCDC80", "LUM", "LYZ", "NKG7", "CD3E", "MS4A1", "MKI67", "RGS5", "COX4I1", "CA4", "VWF", "TAGLN")) + RotatedAxis()
 p1 + p2
 
 # RNA Count High: 35 (29 and 30 also high but near other clusters with high counts)
@@ -948,10 +1079,10 @@ p1 + p2
 ###############################
 # Exclude Junk, Doublets
 ###############################
-Vascular <- subset(Vascular, idents = c(35), invert = T)
+Vascular <- subset(Vascular, idents = c(1,4,6,18,29,30,31,33,35), invert = T)
 
 ###############################
-# ROUND 4: n = 56,645 cells
+# ROUND 4: n = 45,256 cells
 ###############################
 ###############################
 # Variable Features, scaling, regress, PCA
@@ -981,8 +1112,8 @@ p1 <- DimPlot(Vascular, label = T) + NoLegend()
 p2 <- VlnPlot(Vascular, features = "percent.mt", pt.size = 0) + NoLegend()
 p1 + p2
 
-# Clust 17
-p2 <- DotPlot(Vascular, features = c("CCDC80", "LUM", "LYZ", "NKG7", "CD3E", "MS4A1"))
+# Clust 9, 13, 14, 15 have markers of both endothelium and VSMC so likely doublet. Clust 15 has macrophage markers so likely doublet as well.
+p2 <- DotPlot(Vascular, features = c("CCDC80", "LUM", "LYZ", "NKG7", "CD3E", "MS4A1", "RGS5", "TAGLN", "VWF", "ACKR1", "CXCL10", "MKI67"))
 p1 + p2
 
 # Pass QC
@@ -992,10 +1123,10 @@ p1 + p2
 ###############################
 # Exclude Junk, Doublets
 ###############################
-Vascular <- subset(Vascular, idents = c(17), invert = T)
+Vascular <- subset(Vascular, idents = c(9, 13, 14, 15), invert = T)
 
 ###############################
-# FINAL ROUND: n = 56,267 cells
+# FINAL ROUND: n = 41,958 cells
 ###############################
 ###############################
 # Variable Features, scaling, regress, PCA
@@ -1015,7 +1146,7 @@ Vascular <- RunHarmony(Vascular, "Lane", assay.use = "RNA", max.iter.harmony = 3
 ###############################
 Vascular <- Vascular %>% RunUMAP(reduction = 'harmony', dims = 1:15) %>%
   FindNeighbors(reduction = 'harmony', dims = 1:15) %>% 
-  FindClusters(resolution = 1.0)
+  FindClusters(resolution = 0.5)
   
 ###############################
 # Visualize
@@ -1054,29 +1185,25 @@ p2 <- DotPlot(Vascular, features = c("GJA5", "GJA4", "HEY1", "SEMA3G", "CA4", "V
 p1 + p2
 
 Idents(Vascular) <- "seurat_clusters"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(8))) <- "Arterial EC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(9,10))) <- "VSMC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(3))) <- "Pericyte"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(2,6))) <- "Capillary EndoMT-like"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(11))) <- "Arterial EndoMT-like"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(16))) <- "Cycling Vascular Cells"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(14))) <- "Venous EndoMT-like"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(4,15))) <- "Venous EC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(12))) <- "Ven-Cap EC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(0,7,13))) <- "Capillary EC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c(1,5))) <- "Intermediate Capillary EC"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(0,3,6))) <- "Capillary EC"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(1))) <- "Venous EC"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(2))) <- "Pericyte"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(4))) <- "Arterial EC"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(5))) <- "VSMC 1"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(7))) <- "VSMC 2"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c(8))) <- "Cycling Vascular"
 Vascular[['Annotation']] <- Idents(Vascular)
 
 ###############################
 # Save
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
 dir.create(tmp_dir)
 
 saveRDS(Vascular, file = paste0(tmp_dir, "/", "Vascular.rds"))
 
 # 6. T Cells_____________________________________________________
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
 Lymphoid <- readRDS(paste0(tmp_dir, "/", "Lymphoid.rds"))
 
 
@@ -1226,7 +1353,7 @@ p1 + p2
 ###############################
 # Annotation
 ###############################
-markers <- FindAllMarkers(CD4, only.pos = T, min.pct = 0.25, assay = "RNA")
+markers <- FindAllMarkers(CD4, only.pos = T, min.pct = 0.1, assay = "RNA")
 
 Idents(CD4) <- "seurat_clusters"
 Idents(CD4, cells = WhichCells(CD4, idents = c(1,5))) <- "CD4 TEM"
@@ -1286,91 +1413,6 @@ CD8[['Annotation']] <- Idents(CD8)
 ###############################
 saveRDS(CD8, file = paste(tmp_dir, "CD8.rds", sep = "/"))
 
-#8. Macrophage_____________________________________________________
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
-Myeloid <- readRDS(paste0(tmp_dir, "/", "Myeloid.rds"))
-
-Macrophage <- subset(Myeloid, idents = c("PVM", "IM", "LAM", "Mo-Mac"))
-
-###############################
-# Macrophage Round 1
-###############################
-# Recluster
-DefaultAssay(Macrophage) <- "RNA"
-Macrophage <- Macrophage %>% FindVariableFeatures(verbose = T, nfeatures = 3000) %>%
-        ScaleData(vars.to.regress = c("percent.mt", "nCount_RNA"), assay = "RNA") %>%
-        RunPCA()
-
-# Run Harmony
-Macrophage <- RunHarmony(Macrophage, "Lane", assay.use = "RNA", max.iter.harmony = 30)
-
-# Run Donwstream Analysis
-Macrophage <- Macrophage %>% RunUMAP(reduction = 'harmony', dims = 1:20) %>%
-  FindNeighbors(reduction = 'harmony', dims = 1:20) %>% 
-  FindClusters(resolution = 1.0)
-
-# Visualize
-p1 <- DimPlot(Macrophage, label = T) + NoLegend()
-p2 <- DimPlot(Macrophage, label = T, group.by = "Annotation") + NoLegend()
-p1 + p2
-
-p2 <- VlnPlot(Macrophage, features = 'percent.mt', pt.size = 0) + NoLegend()
-p1 + p2
-
-p2 <- VlnPlot(Macrophage, features = 'nCount_RNA', pt.size = 0) + NoLegend()
-p1 + p2
-
-# Markers
-markers <- FindAllMarkers(Macrophage, only.pos = T, min.pct = 0.25, assay = "RNA")
-
-# Remove cluster 12 (more dendritic), and cluster 13 (high RNA count)
-Macrophage <- subset(Macrophage, idents = c(12,13), invert = T)
-
-###############################
-# Macrophage Round 2
-###############################
-# Recluster
-DefaultAssay(Macrophage) <- "RNA"
-Macrophage <- Macrophage %>% FindVariableFeatures(verbose = T, nfeatures = 3000) %>%
-        ScaleData(vars.to.regress = c("percent.mt", "nCount_RNA"), assay = "RNA") %>%
-        RunPCA()
-
-# Run Harmony
-Macrophage <- RunHarmony(Macrophage, "Lane", assay.use = "RNA", max.iter.harmony = 30)
-
-# Run Donwstream Analysis
-Macrophage <- Macrophage %>% RunUMAP(reduction = 'harmony', dims = 1:20) %>%
-  FindNeighbors(reduction = 'harmony', dims = 1:20) %>% 
-  FindClusters(resolution = 0.4)
-
-# Visualize
-p1 <- DimPlot(Macrophage, label = T) + NoLegend()
-p2 <- DimPlot(Macrophage, label = T, group.by = "Annotation") + NoLegend()
-p1 + p2
-
-p2 <- VlnPlot(Macrophage, features = 'percent.mt', pt.size = 0) + NoLegend()
-p1 + p2
-
-p2 <- VlnPlot(Macrophage, features = 'nCount_RNA', pt.size = 0) + NoLegend()
-p1 + p2
-
-p2 <- VlnPlot(Macrophage, features = c("TREM2", "CXCL3", "C1QB", "LYVE1"), pt.size = 0, ncol = 2)
-p1 + p2
-
-###############################
-# Annotation
-###############################
-Idents(Macrophage) <- "seurat_clusters"
-Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(0))) <- "IM"
-Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(1))) <- "PVM"
-Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(2))) <- "LAM"
-Idents(Macrophage, cells = WhichCells(Macrophage, idents = c(3))) <- "Mo-Mac"
-Macrophage[["Annotation"]] <- Idents(Macrophage)
-
-###############################
-# Save RDS
-###############################
-saveRDS(Macrophage, file = paste(tmp_dir, "Macrophage.rds", sep = "/"))
 
 
 

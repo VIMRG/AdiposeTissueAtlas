@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- FINAL INTEGRATION ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: This script will merge all of the subsets that have been clean.
 ##############################################################################################
 
@@ -24,7 +24,7 @@ date = "6.27"
 ###############################
 # Load seurat objects
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis")
 
 Vascular <- readRDS(paste0(tmp_dir, "/", "Vascular.rds"))
 Stromal <- readRDS(paste0(tmp_dir, "/", "Stromal.rds"))
@@ -46,7 +46,7 @@ DefaultAssay(Lymphoid) <- "RNA"
 ###############################
 # Create Celltype Label
 ###############################
-Vascular[['CellType']] <- "Vascular"
+Vascular[['CellType']] <- ifelse(Vascular$Annotation %in% c("Venous EC", "Capillary EC", "Arterial EC"), "Endothelial", "Vascular Smooth Muscle")
 Stromal[['CellType']] <- "Stromal"
 Bcells[['CellType']] <- "B Cells"
 Myeloid[['CellType']] <- "Myeloid"
@@ -93,9 +93,17 @@ integrated.data <- RunHarmony(integrated.data, "Lane", assay.use = "RNA", max.it
 integrated.data <- integrated.data %>% RunUMAP(reduction = 'harmony', dims = 1:40) %>%
   FindNeighbors(reduction = 'harmony', dims = 1:40) %>% 
   FindClusters(resolution = 2.0)
-  
+
+###############################
+# QC Check
+###############################
+VlnPlot(integrated.data, features = c("RGS5", "VWF"), pt.size = 0)
+
+# Cluster 35 is a endothelial/vascular stromal doublet. It does not appear in the subset version but regardless, will remove here since that is not informative.
+integrated.data <- subset(integrated.data, idents = c("31"), invert = T)
+
 # 4. SAVE RDS_____________________________________________________
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Final_Integration")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/Final_Integration")
 dir.create(tmp_dir)
 
 saveRDS(integrated.data, file = paste0(tmp_dir, "/", "Integrated.rds"))

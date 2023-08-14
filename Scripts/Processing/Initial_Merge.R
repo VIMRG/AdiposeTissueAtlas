@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- INITIAL HIV+ INTEGRATION---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: The following code will perform integration with harmony of the HIV+ individuals.
 ## This includes doublets tagged by genetic demultiplexing and DoubletFinder.
 ##############################################################################################
@@ -20,13 +20,13 @@ date = "6.27"
 ###############################
 # Import Dataset
 ###############################
-path <- "/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/DoubletFinder/"
+path <- "../DoubletFinder/"
 file_list <- list.files(path = path, pattern = ".rds")
 
 project <- c('P5344_CW1', 'P5344_CW2', 'P5544_CW1', 'P5544_CW2', 'P5573_CW1', 'P5573_CW2', 'P5657_CW1', 'P5836_CW1', 'P5836_CW2', 
 'P5877_CW1', 'P5877_CW2', 'P5903_CW1', 'P5903_CW2', 'P5963_CW1', 'P5963_CW2')
 
-seurat_path = paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/DoubletFinder")
+seurat_path = paste0("../HATIM_Analysis/", date, "/DoubletFinder")
 seurat_list <- list.files(path = seurat_path, full.names = T)
 seurat_list <- seurat_list[grep(pattern = "(_CW1|_CW2)", seurat_list)]
 names(seurat_list) <- project
@@ -75,7 +75,7 @@ integrated.data <- integrated.data %>% RunUMAP(reduction = 'harmony', dims = 1:4
 
 # 3. SAVE_____________________________________________________
 date = "6.27"
-tmp_dir <- paste("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Merged_Initial", sep = "")
+tmp_dir <- paste("../HATIM_Analysis/", date, "/Merged_Initial", sep = "")
 dir.create(tmp_dir)
 
 saveRDS(integrated.data, file = paste(tmp_dir, "Integrated_Doublets.rds", sep = "/"))
