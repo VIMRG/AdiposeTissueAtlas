@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- DOUBLET REMOVAL ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: After applying  DoubletFinder, the parameters that take into
 ## account the homotypic doublets performed the best with 98.6% specificity for ground truth doublets
 ## (defined as the final dataset). Additionally, the 4,000 cell discrepancy did not remove any one
@@ -22,7 +22,7 @@ options(future.seed = TRUE)
 
 set.seed(7412)
 
-path = "/data/p_koethe_lab/Atlas_AT/HATIM_Analysis"
+path = "../HATIM_Analysis"
 date = "6.27"
 
 #2. LOAD DATA_____________________________________________________
