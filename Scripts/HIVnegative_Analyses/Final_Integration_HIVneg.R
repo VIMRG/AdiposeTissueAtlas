@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- FINAL INTEGRATION ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: This script will merge all of the subsets that have been clean.
 ##############################################################################################
 
@@ -9,13 +9,8 @@
 # Import Libraries
 ###############################
 library(Seurat)
-library(future)
 library(tidyverse)
 library(harmony)
-
-plan("multiprocess", workers = 8)
-options(future.globals.maxSize = 17000 * 1024^2)
-options(future.seed = TRUE)
 
 set.seed(7412)
 
@@ -24,7 +19,7 @@ date = "6.27"
 ###############################
 # Load seurat objects
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis_HIVneg")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/SubsetAnalysis_HIVneg")
 
 Vascular <- readRDS(paste0(tmp_dir, "/", "Vascular_HIVneg.rds"))
 Stromal <- readRDS(paste0(tmp_dir, "/", "Stromal_HIVneg.rds"))
@@ -46,7 +41,7 @@ DefaultAssay(Lymphoid) <- "RNA"
 ###############################
 # Create Celltype Label
 ###############################
-Vascular[['CellType']] <- "Vascular"
+Vascular[['CellType']] <- ifelse(Vascular$Annotation %in% c("Venous EC", "Capillary EC", "Arterial EC"), "Endothelial", "Vascular Smooth Muscle")
 Stromal[['CellType']] <- "Stromal"
 Bcells[['CellType']] <- "B Cells"
 Myeloid[['CellType']] <- "Myeloid"
@@ -66,6 +61,12 @@ Lymphoid[['Major_CellType']] <- "Lymphoid"
 ###############################
 # Merge Datasets
 ###############################
+Lymphoid[['SCT']] <- NULL # Not entirely clear why but will not merge unless I get rid of SCT. This is fine as this assay wasn't used for downstream processing
+Stromal[['SCT']] <- NULL
+Bcells[['SCT']] <- NULL
+Vascular[['SCT']] <- NULL
+Myeloid[['SCT']] <- NULL
+
 integrated.data <- merge(x = Stromal, y = c(Vascular, Bcells, Myeloid, Lymphoid))
 
 # Clear Space
@@ -95,7 +96,7 @@ integrated.data <- integrated.data %>% RunUMAP(reduction = 'harmony', dims = 1:4
   FindClusters(resolution = 2.0)
   
 # 4. SAVE RDS_____________________________________________________
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Final_Integration_HIVneg")
+tmp_dir <- paste0("../HATIM_Analysis/", date, "/Final_Integration_HIVneg")
 dir.create(tmp_dir)
 
 saveRDS(integrated.data, file = paste0(tmp_dir, "/", "Integrated_HIVneg.rds"))
