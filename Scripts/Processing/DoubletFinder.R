@@ -1,6 +1,6 @@
 ##############################################################################################
 ##------------------------- DOUBLET FINDER PARALLELIZATION ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: The following code uses DoubletFinder to identify potential heterotypic doublets
 # after genetic demultiplexing has removed homotypic doublets. Based on 10x Chromium expected
 # doublets accounting for multiplexing of 4 unique individuals, I expect after genetic demultiplexing
@@ -31,7 +31,7 @@ options(future.seed = TRUE)
 # Import data
 ###------------------------------####
 # Read in files
-path <- "/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/processed/"
+path <- "../processed"
 
 file_list <- list.files(path = path, pattern = ".rds")
 
@@ -77,5 +77,5 @@ seurat_object[['pANN']] <- seurat_object[[pANN]] # Save pANN to common name
 seurat_object[[pANN]] <- NULL # Remove unique pANN
 
 name <- names(file)
-dir.create("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/DoubletFinder/")
-saveRDS(seurat_object, file = paste("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/6.27/DoubletFinder/", name, ".rds", sep = ""))
+dir.create("../DoubletFinder")
+saveRDS(seurat_object, file = paste("../DoubletFinder", name, ".rds", sep = ""))
