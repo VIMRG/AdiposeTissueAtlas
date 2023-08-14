@@ -1,6 +1,6 @@
 ##############################################################################################
 ##---------------- HATIM SINGLE CELL SUBCUTANEOUS ADIPOSE TISSUE ATLAS----------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: The following code will process and analyze 10x data for the HATIM cohort with
 ## the goal to characterize the cell populations in persons with HIV and in HIV- diabetic persons. 
 ## Runs were multiplexed in groups of 4 and 91 individuals were sequenced in a total of 23   
@@ -21,8 +21,8 @@ set.seed(7612) # Reproducibility
 ###############################
 # set directory
 ###############################
-Analysis_dir <- "/data/p_koethe_lab/Atlas_AT"
-Cellranger_dir <- "/data/p_koethe_lab/Atlas_AT/Analysis_1.22/CellRanger_count"
+Analysis_dir <- "../Atlas_AT"
+Cellranger_dir <- "../CellRanger_count"
 date <- "6.27"
 
 ###############################
@@ -57,7 +57,7 @@ SoupX_Fun <- function(project) {
     print("Adjusting Counts")
     out = adjustCounts(sc) # Generate corrected count matrix
     print("Writing corrected matrix")
-    tmp_path <- paste("/data/p_koethe_lab/Atlas_AT/Analysis_", date, "/SoupX/", project, sep = "")
+    tmp_path <- paste("../Analysis_", date, "/SoupX/", project, sep = "")
     dir.create(file.path(tmp_path), recursive = T) # Create directory to store corrected matrix
     DropletUtils:::write10xCounts(tmp_path, out, overwrite = TRUE) # Use DropletUtils write10xCounts function to write matrix, feature, and barcode to directory
     print(paste("Corrected Matrix has successfully saved to ", tmp_path, ".", sep = ""))
@@ -72,7 +72,7 @@ lapply(project, SoupX_Fun)
 ###############################
 # Load Corrected Matrices
 ###############################
-soupX_path <- paste("/data/p_koethe_lab/Atlas_AT/Analysis_", "1.22", "/SoupX", sep = "")
+soupX_path <- paste("../Analysis_", "1.22", "/SoupX", sep = "")
 
 Read_sparse <- function(project, soupX_path) {
     tmp_dir <- paste(soupX_path, project, sep = "/")
@@ -182,7 +182,7 @@ seurat_list <- lapply(seurat_list, FUN = function(xx) {
 ###############################
 # Add SouporCell Data
 ###############################
-soup_path <- paste("/data/p_koethe_lab/Atlas_AT/Analysis_", "1.22", "/Soup", sep = "")
+soup_path <- paste("../Analysis_", "1.22", "/Soup", sep = "")
 
 Soup_fun <- function(project) {
     tmp_dir <- paste(soup_path, project, sep = "/")
@@ -201,7 +201,7 @@ for (i in 1:length(seurat_list)) {
 }
 
 # 8. SAVE Unprocessed SEURAT OBJECTS PRIOR TO APPLYING QC-------------------------------------
-tmp_dir <- paste("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis", date, "unprocessed", sep = "/")
+tmp_dir <- paste("../HATIM_Analysis", date, "unprocessed", sep = "/")
 dir.create(tmp_dir)
 
 for (i in 1:length(seurat_list)) {
@@ -212,7 +212,7 @@ for (i in 1:length(seurat_list)) {
 }
 
 # Read in seurat files
-seurat_path = paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/unprocessed")
+seurat_path = paste0("../HATIM_Analysis/", date, "/unprocessed")
 seurat_list <- list.files(path = seurat_path, full.names = T)
 names(seurat_list) <- project
 seurat_list <- lapply(seurat_list, function(xx) {
@@ -300,12 +300,11 @@ seurat_list <- lapply(seurat_list, Soup_Hash_fun)
 seurat_list[[20]]$Soup_Hash <- ifelse(seurat_list[[20]]$assignment == 2, 254, seurat_list[[20]]$Soup_Hash) # Cite-seq didn't work that well in this run. 252 diffusely positive so by process of elimination,
 
 # Of note, lane P5836_CW1 only had 3 genotypic clusters due to small sample size (technically 4 but only 2 cells in the genotypic cluster). Thus, only 3 individuals were meaningfully tagged back to hashtag.
-#Since we are not sure definitively where they came from, will leave unassigned and remove later. This affects ~ 1200 cells
 
 ###############################
 # Save
 ###############################
-tmp_dir <- paste("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis", date, "processed", sep = "/")
+tmp_dir <- paste("../HATIM_Analysis", date, "processed", sep = "/")
 dir.create(tmp_dir)
 
 for (i in 1:length(seurat_list)) {
