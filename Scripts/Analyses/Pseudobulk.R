@@ -1,6 +1,6 @@
 #############################################################################################
 ##------------------------- PSEUDOBULK ANALYSIS ---------------------------------##
-##------------------------- DATE: 6/27/2022 AUTHOR: SAM BAILIN-------------------------------##
+##------------------------- AUTHOR: SAM BAILIN-------------------------------##
 ## DESCRIPTION: This script will evaluate DGE using Pseudobulk.
 ##############################################################################################
 
@@ -21,12 +21,14 @@ library(ggplot2)
 
 set.seed(7412)
 
-date = "6.27"
+date = "1.7.23"
+
+source("../Utils.R")
 
 ###############################
 # Load seurat objects
 ###############################
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/SubsetAnalysis")
+tmp_dir <- paste0("../SubsetAnalysis")
 
 Vascular <- readRDS(paste0(tmp_dir, "/", "Vascular.rds"))
 Stromal <- readRDS(paste0(tmp_dir, "/", "Stromal.rds"))
@@ -35,152 +37,14 @@ Macrophage <- readRDS(paste0(tmp_dir, "/", "Macrophage.rds"))
 CD4 <- readRDS(paste0(tmp_dir, "/", "CD4.rds"))
 CD8 <- readRDS(paste0(tmp_dir, "/", "CD8.rds"))
 
-tmp_dir <- paste0("/data/p_koethe_lab/Atlas_AT/HATIM_Analysis/", date, "/Pseudobulk")
+tmp_dir <- paste0("../", date, "/Pseudobulk")
 dir.create(tmp_dir)
 DM_dir <- paste(tmp_dir, "DiabeticVsNonDM", sep = "/")
 dir.create(DM_dir)
 PreDM_dir <- paste(tmp_dir, "PreDMvsNonDM", sep = "/")
 dir.create(PreDM_dir)
 
-# 2. FUNCTIONS_____________________________________________________
-###############################
-# Aggregate Cell groups by individual
-###############################
-Aggregate <- function(seurat_object) {
-    sce <- as.SingleCellExperiment(seurat_object, assay = "RNA") # Convert to SCE
-    agg.sce <- aggregateAcrossCells(sce, ids = colData(sce)[,c("Pseudobulk", "HATIMID")]) # Aggregate by cluster and sample
-    colData(agg.sce)$Pseudobulk <- as.character(colData(agg.sce)$Pseudobulk) # Change Manual Annotation to character for next step
-    colData(agg.sce)$HATIMID <- as.character(colData(agg.sce)$HATIMID) # Change Manual Annotation to character for next step
-    colnames(agg.sce) <- apply(colData(agg.sce)[,c("Pseudobulk", "HATIMID")], 1, function(x) paste(x, collapse="_")) # Add column names
-    return(agg.sce)
-}
-
-###############################
-# Evaluate Outliers
-###############################
-Outlier_Eval <- function(agg.sce, cluster, StudyGroup1 = "HIV+ diabetic", StudyGroup2 = "HIV+ non-diabetic") {
-    agg.sce <- subset(agg.sce, , Pseudobulk == cluster) # subset on cluster of interest
-    agg.sce <- subset(agg.sce, , StudyGroup %in% c(StudyGroup1, StudyGroup2)) # subset on studygroup of interest
-    agg.sce <- subset(agg.sce, , ncells > 5) # take only clusters with > 5 cells
-    
-    if (StudyGroup2 == "HIV+ non-diabetic") {
-        label2 = "HIVnonDM"
-    } else if (StudyGroup2 == "HIV- diabetic") {
-        label2 = "HIVnegDM"
-    } else if (StudyGroup2 == "HIV+ prediabetic") {
-        label2 = "HIVpreDM"
-    }
-    
-        if (StudyGroup1 == "HIV+ diabetic") {
-        label1 = "HIVDM"
-    } else if (StudyGroup1 == "HIV+ prediabetic") {
-        label1 = "HIVpreDM"
-    }
-    
-    metadata <- colData(agg.sce)[,c("StudyGroup", "Age", "Sex", "BMI", "Lane")]
-    metadata$StudyGroup <- factor(metadata$StudyGroup, levels = c(StudyGroup1, StudyGroup2), labels = c(label1, label2))
-    metadata$Sex <- factor(metadata$Sex)
-    metadata$Lane <- factor(metadata$Lane)
-    
-    if (all(rownames(metadata) != colnames(assay(agg.sce, 'counts')))) {
-        stop("Metadata rownames do not equal assay column names.") # Using stop function
-    }
-    
-    dds <- DESeqDataSetFromMatrix(round(assay(agg.sce, 'counts')), 
-                    colData = metadata, 
-                    design = ~ StudyGroup + Age + BMI + Sex)
-    vst_dds <- vst(dds, blind = TRUE)
-    return(vst_dds)
-}
-
-###############################
-# Plot Outliers
-###############################
-Outlier_Plot <- function(agg.sce, vst, cluster, StudyGroup1 = "HIV+ diabetic", StudyGroup2 = "HIV+ non-diabetic") {
-    agg.sce <- subset(agg.sce, , Pseudobulk == cluster) # subset on cluster of interest
-    agg.sce <- subset(agg.sce, , StudyGroup %in% c(StudyGroup1, StudyGroup2)) # subset on studygroup of interest
-    agg.sce <- subset(agg.sce, , ncells > 5) # take only clusters with > 5 cells
-    
-    if (StudyGroup2 == "HIV+ non-diabetic") {
-        label2 = "HIVnonDM"
-    } else if (StudyGroup2 == "HIV- diabetic") {
-        label2 = "HIVnegDM"
-    } else if (StudyGroup2 == "HIV+ prediabetic") {
-        label2 = "HIVpreDM"
-    }
-    
-        if (StudyGroup1 == "HIV+ diabetic") {
-        label1 = "HIVDM"
-    } else if (StudyGroup1 == "HIV+ prediabetic") {
-        label1 = "HIVpreDM"
-    }
-    
-    metadata <- colData(agg.sce)[,c("StudyGroup", "Age", "Sex", "BMI", "Lane")]
-    metadata$StudyGroup <- factor(metadata$StudyGroup, levels = c(StudyGroup1, StudyGroup2), labels = c(label1, label2))
-    metadata$Sex <- factor(metadata$Sex)
-    metadata$Lane <- factor(metadata$Lane)
-    vst_mat <- assay(vst)
-    vst_cor <- cor(vst_mat)
-    annotation <- data.frame(metadata[,c("StudyGroup", "Lane", "Sex", "Age", "BMI"), drop = F])
-    plot <- pheatmap(vst_cor, annotation_col = annotation)
-    return(plot)
-}
-
-###############################
-# Perform Pseudobulk
-###############################
-Pseudobulk <- function(agg.sce, cluster, StudyGroup1 = "HIV+ diabetic", StudyGroup2 = "HIV+ non-diabetic", exclude, shrinkage = T) {
-    agg.sce <- subset(agg.sce, , Pseudobulk == cluster) # subset on cluster of interest
-    agg.sce <- subset(agg.sce, , StudyGroup %in% c(StudyGroup1, StudyGroup2)) # subset on studygroup of interest
-    agg.sce <- subset(agg.sce, , ncells > 5) # take only clusters with > 5 cells
-    agg.sce <- subset(agg.sce, , !HATIMID %in% exclude) # exclude outlier
-    
-    if (StudyGroup2 == "HIV+ non-diabetic") {
-        label2 = "HIVnonDM"
-    } else if (StudyGroup2 == "HIV- diabetic") {
-        label2 = "HIVnegDM"
-    } else if (StudyGroup2 == "HIV+ prediabetic") {
-        label2 = "HIVpreDM"
-    }
-    
-    if (StudyGroup1 == "HIV+ diabetic") {
-        label1 = "HIVDM"
-    } else if (StudyGroup1 == "HIV+ prediabetic") {
-        label1 = "HIVpreDM"
-    }
-    
-    metadata <- colData(agg.sce)[,c("StudyGroup", "Age", "Sex", "BMI", "Lane")]
-    metadata$StudyGroup <- factor(metadata$StudyGroup, levels = c(StudyGroup2, StudyGroup1), labels = c(label2, label1))
-    metadata$Sex <- factor(metadata$Sex)
-    metadata$Lane <- factor(metadata$Lane)
-    
-    if (all(rownames(metadata) != colnames(assay(agg.sce, 'counts')))) {
-        stop("Metadata rownames do not equal assay column names.") # Using stop function
-    }
-    
-    dds <- DESeqDataSetFromMatrix(round(assay(agg.sce, 'counts')), 
-                    colData = metadata, 
-                    design = ~ StudyGroup + Age + BMI + Sex)
-    
-    keep <- rowSums(counts(dds)) >= 3
-    dds <- dds[keep,]
-    dds <- DESeq(dds)
-    
-    if(shrinkage) {
-        res <- lfcShrink(dds, coef = paste0("StudyGroup_", label1, "_vs_", label2), type = "apeglm")
-    } else {
-        res <- results(dds, contrast=c("StudyGroup", label1, label2))
-    }
-
-    summary(res)
-    resOrderedwald <- res[order(res$padj),] # order by pvalue
-    resOrderedwald <- resOrderedwald[!is.na(resOrderedwald$padj),] # Remove NAs
-    resOrderedDFwald <- as.data.frame(resOrderedwald)
-    return(resOrderedDFwald)
-}
-
-
-# 3. MACROPHAGE PSEUDOBULK_____________________________________________________
+# 2. MACROPHAGE PSEUDOBULK_____________________________________________________
 ###############################
 # OVERALL MACROPHAGE
 ###############################
@@ -215,9 +79,10 @@ agg.macrophage <- Aggregate(Macrophage)
 # HIV+ DM vs HIV+ non-DM
 Outlier <- Outlier_Eval(agg.macrophage, cluster = "PVM")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
+DESeq2::plotPCA(Outlier, intgroup = 'Lane')
 Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "PVM")
 
-PVM.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "PVM", exclude = c("1132")) # Remove substantial outliers (spearmans 0.6)
+PVM.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "PVM", exclude = c("1132"))
 write.csv(PVM.DM.NonDM, file = paste(DM_dir, "PVM.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
@@ -225,7 +90,7 @@ Outlier <- Outlier_Eval(agg.macrophage, cluster = "PVM", StudyGroup1 = "HIV+ pre
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "PVM", StudyGroup1 = "HIV+ prediabetic")
 
-PVM.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "PVM", exclude = c(""), StudyGroup1 = "HIV+ prediabetic")
+PVM.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "PVM", exclude = c("1132", "1165"), StudyGroup1 = "HIV+ prediabetic")
 write.csv(PVM.PreDM.NonDM, file = paste(PreDM_dir, "PVM.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 ###############################
@@ -255,7 +120,7 @@ Outlier <- Outlier_Eval(agg.macrophage, cluster = "LAM")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "LAM")
 
-LAM.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "LAM", exclude = c("3014")) # Remove substantial outliers (spearmans 0.6)
+LAM.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "LAM", exclude = c("3014"))
 write.csv(LAM.DM.NonDM, file = paste(DM_dir, "LAM.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
@@ -267,23 +132,42 @@ LAM.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "LAM", exclude = c("1137
 write.csv(LAM.PreDM.NonDM, file = paste(PreDM_dir, "LAM.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 ###############################
-# Mo-Mac
+# Mo-Mac 1
 ###############################
 # HIV+ DM vs HIV+ non-diabetic
-Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac")
+Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac 1")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
-Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac")
+Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac 1")
 
-MoMac.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac", exclude = c("1109")) # Remove substantial outliers (spearmans 0.6)
-write.csv(MoMac.DM.NonDM, file = paste(DM_dir, "MoMac.HIVDM.HIVnonDM.csv", sep = "/"))
+MoMac.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac 1", exclude = c(""))
+write.csv(MoMac.DM.NonDM, file = paste(DM_dir, "MoMac1.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
-Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac", StudyGroup1 = "HIV+ prediabetic")
+Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac 1", StudyGroup1 = "HIV+ prediabetic")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
-Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac", StudyGroup1 = "HIV+ prediabetic")
+Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac 1", StudyGroup1 = "HIV+ prediabetic")
 
-MoMac.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac", exclude = c("1109", "1167"), StudyGroup1 = "HIV+ prediabetic")
-write.csv(MoMac.PreDM.NonDM, file = paste(PreDM_dir, "MoMac.HIVpreDM.HIVnonDM.csv", sep = "/"))
+MoMac.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac 1", exclude = c(""), StudyGroup1 = "HIV+ prediabetic")
+write.csv(MoMac.PreDM.NonDM, file = paste(PreDM_dir, "MoMac1.HIVpreDM.HIVnonDM.csv", sep = "/"))
+
+###############################
+# Mo-Mac 2
+###############################
+# HIV+ DM vs HIV+ non-diabetic
+Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac 2")
+DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
+Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac 2")
+
+MoMac.DM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac 2", exclude = c("1109"))
+write.csv(MoMac.DM.NonDM, file = paste(DM_dir, "MoMac2.HIVDM.HIVnonDM.csv", sep = "/"))
+
+# HIV+ PreDM vs HIV+ non-diabetic
+Outlier <- Outlier_Eval(agg.macrophage, cluster = "Mo-Mac 2", StudyGroup1 = "HIV+ prediabetic")
+DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
+Plot <- Outlier_Plot(agg.macrophage, vst = Outlier, cluster = "Mo-Mac 2", StudyGroup1 = "HIV+ prediabetic")
+
+MoMac.PreDM.NonDM <- Pseudobulk(agg.macrophage, cluster = "Mo-Mac 2", exclude = c("1109"), StudyGroup1 = "HIV+ prediabetic")
+write.csv(MoMac.PreDM.NonDM, file = paste(PreDM_dir, "MoMac2.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 # 3. CD4 PSEUDOBULK_____________________________________________________
 ###############################
@@ -320,7 +204,7 @@ Outlier <- Outlier_Eval(agg.Myeloid, cluster = "Monocyte")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Myeloid, vst = Outlier, cluster = "Monocyte")
 
-Mo.DM.NonDM <- Pseudobulk(agg.Myeloid, cluster = "Monocyte", exclude = c(""))
+Mo.DM.NonDM <- Pseudobulk(agg.Myeloid, cluster = "Monocyte", exclude = c("1167", '3015', '3031'))
 write.csv(Mo.DM.NonDM, file = paste(DM_dir, "Monocyte.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
@@ -328,7 +212,7 @@ Outlier <- Outlier_Eval(agg.Myeloid, cluster = "Monocyte", StudyGroup1 = "HIV+ p
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Myeloid, vst = Outlier, cluster = "Monocyte", StudyGroup1 = "HIV+ prediabetic")
 
-Mo.PreDM.NonDM <- Pseudobulk(agg.Myeloid, cluster = "Monocyte", exclude = "", StudyGroup1 = "HIV+ prediabetic")
+Mo.PreDM.NonDM <- Pseudobulk(agg.Myeloid, cluster = "Monocyte", exclude = "1165", StudyGroup1 = "HIV+ prediabetic")
 write.csv(Mo.PreDM.NonDM, file = paste(PreDM_dir, "Monocyte.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 # 5. CD8 PSEUDOBULK_____________________________________________________
@@ -351,7 +235,7 @@ Outlier <- Outlier_Eval(agg.CD8, cluster = "CD8", StudyGroup1 = "HIV+ prediabeti
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.CD8, vst = Outlier, cluster = "CD8", StudyGroup1 = "HIV+ prediabetic")
 
-CD8.PreDM.NonDM <- Pseudobulk(agg.CD8, cluster = "CD8", exclude = "", StudyGroup1 = "HIV+ prediabetic")
+CD8.PreDM.NonDM <- Pseudobulk(agg.CD8, cluster = "CD8", exclude = c("2110"), StudyGroup1 = "HIV+ prediabetic")
 write.csv(CD8.PreDM.NonDM, file = paste(PreDM_dir, "CD8.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 # 6. VASCULAR PSEUDOBULK_____________________________________________________
@@ -359,8 +243,8 @@ write.csv(CD8.PreDM.NonDM, file = paste(PreDM_dir, "CD8.HIVpreDM.HIVnonDM.csv", 
 # OVERALL ENDOTHELIAL
 ###############################
 Idents(Vascular) <- "Annotation"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c("Venous EC", "Arterial EC", "Intermediate Capillary EC", "Capillary EC", "Ven-Cap EC"))) <- "EC"
-Idents(Vascular, cells = WhichCells(Vascular, idents = c("Arterial EndoMT-like", "Venous EndoMT-like", "Capillary EndoMT-like"))) <- "EndoMT"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c("Venous EC", "Arterial EC", "Capillary EC"))) <- "EC"
+Idents(Vascular, cells = WhichCells(Vascular, idents = c("VSMC 1", "VSMC 2"))) <- "VSMC"
 Vascular[['Pseudobulk']] <- Idents(Vascular)
 agg.Vascular <- Aggregate(Vascular)
 
@@ -369,7 +253,7 @@ Outlier <- Outlier_Eval(agg.Vascular, cluster = "EC")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Vascular, vst = Outlier, cluster = "EC")
 
-EC.DM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EC", exclude = c("1113", "1182"))
+EC.DM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EC", exclude = c("1113", "1182", "1141"))
 write.csv(EC.DM.NonDM, file = paste(DM_dir, "EC.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
@@ -377,31 +261,12 @@ Outlier <- Outlier_Eval(agg.Vascular, cluster = "EC", StudyGroup1 = "HIV+ predia
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Vascular, vst = Outlier, cluster = "EC", StudyGroup1 = "HIV+ prediabetic")
 
-EC.PreDM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EC", exclude = "", StudyGroup1 = "HIV+ prediabetic")
+EC.PreDM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EC", exclude = c("1113", "1141", "1137", "1182"), StudyGroup1 = "HIV+ prediabetic")
 write.csv(EC.PreDM.NonDM, file = paste(PreDM_dir, "EC.HIVpreDM.HIVnonDM.csv", sep = "/"))
-
-###############################
-# OVERALL ENDOMT
-###############################
-# HIV+ DM vs HIV+ non-diabetic
-Outlier <- Outlier_Eval(agg.Vascular, cluster = "EndoMT")
-DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
-Plot <- Outlier_Plot(agg.Vascular, vst = Outlier, cluster = "EndoMT")
-
-EndoMT.DM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EndoMT", exclude = "")
-write.csv(EndoMT.DM.NonDM, file = paste(DM_dir, "EndoMT.HIVDM.HIVnonDM.csv", sep = "/"))
-
-# HIV+ PreDM vs HIV+ non-diabetic
-Outlier <- Outlier_Eval(agg.Vascular, cluster = "EndoMT", StudyGroup1 = "HIV+ prediabetic")
-DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
-Plot <- Outlier_Plot(agg.Vascular, vst = Outlier, cluster = "EndoMT", StudyGroup1 = "HIV+ prediabetic")
-
-EndoMT.PreDM.NonDM <- Pseudobulk(agg.Vascular, cluster = "EndoMT", exclude = "", StudyGroup1 = "HIV+ prediabetic")
-write.csv(EndoMT.PreDM.NonDM, file = paste(PreDM_dir, "EndoMT.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 # 7. STROMAL PSEUDOBULK_____________________________________________________
 ###############################
-# OVERALL STROMAL
+# Preadipocyte
 ###############################
 Idents(Stromal) <- "Annotation"
 Idents(Stromal, cells = WhichCells(Stromal, idents = c("Mature Preadipocyte 1", "Mature Preadipocyte 2", "Early Preadipocyte", "ECM-Producing Early Preadipocyte"))) <- "Preadipocyte"
@@ -452,7 +317,7 @@ Outlier <- Outlier_Eval(agg.Stromal, cluster = "PCOLCE+ Fibroblast")
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Stromal, vst = Outlier, cluster = "PCOLCE+ Fibroblast")
 
-PCOLCE.DM.NonDM <- Pseudobulk(agg.Stromal, cluster = "PCOLCE+ Fibroblast", exclude = "3013")
+PCOLCE.DM.NonDM <- Pseudobulk(agg.Stromal, cluster = "PCOLCE+ Fibroblast", exclude = "3031")
 write.csv(PCOLCE.DM.NonDM, file = paste(DM_dir, "PCOLCE.HIVDM.HIVnonDM.csv", sep = "/"))
 
 # HIV+ PreDM vs HIV+ non-diabetic
@@ -460,7 +325,7 @@ Outlier <- Outlier_Eval(agg.Stromal, cluster = "PCOLCE+ Fibroblast", StudyGroup1
 DESeq2::plotPCA(Outlier, intgroup = 'StudyGroup')
 Plot <- Outlier_Plot(agg.Stromal, vst = Outlier, cluster = "PCOLCE+ Fibroblast", StudyGroup1 = "HIV+ prediabetic")
 
-PCOLCE.PreDM.NonDM <- Pseudobulk(agg.Stromal, cluster = "PCOLCE+ Fibroblast", exclude = "1109", StudyGroup1 = "HIV+ prediabetic")
+PCOLCE.PreDM.NonDM <- Pseudobulk(agg.Stromal, cluster = "PCOLCE+ Fibroblast", exclude = c("1109", "1151"), StudyGroup1 = "HIV+ prediabetic")
 write.csv(PCOLCE.PreDM.NonDM, file = paste(PreDM_dir, "PCOLCE.HIVpreDM.HIVnonDM.csv", sep = "/"))
 
 ###############################
@@ -481,4 +346,3 @@ Plot <- Outlier_Plot(agg.Stromal, vst = Outlier, cluster = "Myofibroblast", Stud
 
 Myofibroblast.PreDM.NonDM <- Pseudobulk(agg.Stromal, cluster = "Myofibroblast", exclude = c("2110", "1167"), StudyGroup1 = "HIV+ prediabetic")
 write.csv(Myofibroblast.PreDM.NonDM, file = paste(PreDM_dir, "Myofibroblast.HIVpreDM.HIVnonDM.csv", sep = "/"))
-
